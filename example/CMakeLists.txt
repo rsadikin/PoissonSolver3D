@@ -38,10 +38,11 @@ endif(PSLIB_NOTFOUND GREATER -1)
 # install(TARGETS poissonsolvergputest  DESTINATION bin)
 
 
-
+INCLUDE_DIRECTORIES(
+	${CMAKE_PREFIX_PATH}/include
+) 
 set(CPP_SOURCE PoissonSolver3DGPUTest.cpp)
 set(HEADERS PoissonSolver3DGPUTest.h)
 
 add_executable(poissonsolvergputest  ${CPP_SOURCE} ${PSLIB})
-
 install(TARGETS poissonsolvergputest  DESTINATION bin)

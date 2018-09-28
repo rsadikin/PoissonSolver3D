@@ -2,7 +2,7 @@
 #define POISSONSOLVERGPU3DGPUTEST_H
 
 #include <iostream>
-#include "gpulib/PoissonSolver3DGPU.h"
+#include "PoissonSolver3DGPU.h"
 
 
 #endif
