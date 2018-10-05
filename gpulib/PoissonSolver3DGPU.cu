@@ -17,7 +17,7 @@ __device__ __constant__ float d_tempRatioZ;
 /// \param RhoChargeDensity		float*	Array rapat arus
 /// \param RRow					int		Jumlah baris di arah sumbu \f$ r \f$
 /// \param ZColumn				int		Jumlah kolom di arah sumbu \f$ z \f$
-/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ phi \f$
+/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ \phi \f$
 /// \param coef1				float*	Array untuk koefisien \f$  V_{x+1,y,z} \f$
 /// \param coef2				float*	Array untuk koefisien \f$  V_{x-1,y,z} \f$
 /// \param coef3				float*	Array untuk koefisien \f$ z \f$
@@ -69,7 +69,7 @@ __global__ void relaxationGaussSeidelRed
 /// \param RhoChargeDensity		float*	Array rapat arus
 /// \param RRow					int		Jumlah baris di arah sumbu \f$ r \f$
 /// \param ZColumn				int		Jumlah kolom di arah sumbu \f$ z \f$
-/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ phi \f$
+/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ \phi \f$
 /// \param coef1				float*	Array untuk koefisien \f$  V_{x+1,y,z} \f$
 /// \param coef2				float*	Array untuk koefisien \f$  V_{x-1,y,z} \f$
 /// \param coef3				float*	Array untuk koefisien \f$ z \f$
@@ -125,7 +125,7 @@ __global__ void relaxationGaussSeidelBlack
 /// \param DeltaResidue			float*	Array residu
 /// \param RRow					int		Jumlah baris di arah sumbu \f$ r \f$
 /// \param ZColumn				int		Jumlah kolom di arah sumbu \f$ z \f$
-/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ phi \f$
+/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ \phi \f$
 /// \param coef1				float*	Array untuk koefisien \f$  V_{x+1,y,z} \f$
 /// \param coef2				float*	Array untuk koefisien \f$  V_{x-1,y,z} \f$
 /// \param coef3				float*	Array untuk koefisien \f$ z \f$
@@ -168,6 +168,15 @@ __global__ void residueCalculation
 	}
 }
 
+/// Restriksi dari finer grid ke coarser grid dengan operator Half Weighting
+///
+/// \f$ I_h^{2h} = \frac{1}{8} \begin{bmatrix}[ccc] 0 & 1 & 0 \\ 1 & 4 & 1\\ 0 & 1 & 0 \end{bmatrix} 
+///
+/// \param RhoChargeDensity	float*		Array rapat arus
+/// \param DeltaResidue		float*		Array residu hasil relaksasi
+/// \param RRow				const int	Jumlah baris di arah sumbu \f$ r \f$
+/// \param ZColumn			const int	Jumlah kolom di arah sumbu \f$ z \f$	
+/// \param PhiSlice			const int	Jumlah irisan di arah sumbu \f$ \phi \f$
 __global__ void restriction2DHalf
 (
 	float *RhoChargeDensity,
@@ -205,7 +214,15 @@ __global__ void restriction2DHalf
 								0.125 * (DeltaResidue[finer_index_left] + DeltaResidue[finer_index_right] + DeltaResidue[finer_index_up] + DeltaResidue[finer_index_down]);
 	}
 }
-
+/// Restriksi dari finer grid ke coarser grid dengan operator Full Weighting
+///
+/// \f$ I_h^{2h} = \frac{1}{16} \begin{bmatrix}[ccc] 1 & 2 & 1 \\ 2 & 4 & 2\\ 1 & 2 & 1 \end{bmatrix} 
+///
+/// \param RhoChargeDensity	float*		Array rapat arus
+/// \param DeltaResidue		float*		Array residu hasil relaksasi
+/// \param RRow				const int	Jumlah baris di arah sumbu \f$ r \f$
+/// \param ZColumn			const int	Jumlah kolom di arah sumbu \f$ z \f$	
+/// \param PhiSlice			const int	Jumlah irisan di arah sumbu \f$ \phi \f$
 __global__ void restriction2DFull
 (
 	float *RhoChargeDensity,
