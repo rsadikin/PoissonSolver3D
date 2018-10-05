@@ -11,6 +11,17 @@ __device__ __constant__ float d_tempRatioZ;
 
 
 /* GPU kernels start */
+/// Relaksasi menggunakan penyelesaian iteratif Red-Black Gauss-Seidel (bagian Red)
+///
+/// \param VPotential			float* 	Array potensial
+/// \param RhoChargeDensity		float*	Array rapat arus
+/// \param RRow					int		Jumlah baris di arah sumbu \f$ r \f$
+/// \param ZColumn				int		Jumlah kolom di arah sumbu \f$ z \f$
+/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ phi \f$
+/// \param coef1				float*	Array untuk koefisien \f$  V_{x+1,y,z} \f$
+/// \param coef2				float*	Array untuk koefisien \f$  V_{x-1,y,z} \f$
+/// \param coef3				float*	Array untuk koefisien \f$ z \f$
+/// \param coef4				float*	Array untuk koefisien \f$ f(r,\phi,z) \f$
 __global__ void relaxationGaussSeidelRed
 (
 	float *VPotential,
@@ -52,6 +63,17 @@ __global__ void relaxationGaussSeidelRed
 	}
 }
 
+/// Relaksasi menggunakan penyelesaian iteratif Red-Black Gauss-Seidel (bagian Black)
+///
+/// \param VPotential			float* 	Array potensial
+/// \param RhoChargeDensity		float*	Array rapat arus
+/// \param RRow					int		Jumlah baris di arah sumbu \f$ r \f$
+/// \param ZColumn				int		Jumlah kolom di arah sumbu \f$ z \f$
+/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ phi \f$
+/// \param coef1				float*	Array untuk koefisien \f$  V_{x+1,y,z} \f$
+/// \param coef2				float*	Array untuk koefisien \f$  V_{x-1,y,z} \f$
+/// \param coef3				float*	Array untuk koefisien \f$ z \f$
+/// \param coef4				float*	Array untuk koefisien \f$ f(r,\phi,z) \f$
 __global__ void relaxationGaussSeidelBlack
 (
 	float *VPotential,
@@ -93,6 +115,21 @@ __global__ void relaxationGaussSeidelBlack
 	}
 }
 
+/// Menghitung residu dari hasil proses relaksasi
+///
+/// Rumus:
+/// 
+///
+/// \param VPotential			float* 	Array potensial
+/// \param RhoChargeDensity		float*	Array rapat arus
+/// \param DeltaResidue			float*	Array residu
+/// \param RRow					int		Jumlah baris di arah sumbu \f$ r \f$
+/// \param ZColumn				int		Jumlah kolom di arah sumbu \f$ z \f$
+/// \param PhiSlice				int		Jumlah irisan di arah sumbu \f$ phi \f$
+/// \param coef1				float*	Array untuk koefisien \f$  V_{x+1,y,z} \f$
+/// \param coef2				float*	Array untuk koefisien \f$  V_{x-1,y,z} \f$
+/// \param coef3				float*	Array untuk koefisien \f$ z \f$
+/// \param icoef4				float*	Array untuk koefisien invers dari \f$ f(r,\phi,z) \f$
 __global__ void residueCalculation
 (
 	float *VPotential,
