@@ -211,7 +211,7 @@ __global__ void restriction2DFull
 								0.125 * (DeltaResidue[finer_index_left] + DeltaResidue[finer_index_right] + DeltaResidue[finer_index_up] + DeltaResidue[finer_index_down]) +
 								0.0625 * (DeltaResidue[finer_index_up_left] + DeltaResidue[finer_index_up_right] + DeltaResidue[finer_index_down_left] + DeltaResidue[finer_index_down_right]);
 	} else {
-	//	RhoChargeDensity[index] =  DeltaResidue[finer_index];
+		RhoChargeDensity[index] =  DeltaResidue[finer_index];
 	}
 	
 
@@ -240,8 +240,8 @@ __global__ void zeroingVPotential
 
 	if (index_x == ZColumn - 2) {
 		index_x++;
-		index		= d_grid_StartPos + blockIdx.z * RRow * ZColumn + index_y * ZColumn + index_x;
-		VPotential[index] = 0;		
+		index			= d_grid_StartPos + blockIdx.z * RRow * ZColumn + index_y * ZColumn + index_x;
+		VPotential[index] 	= 0;		
 	}
 }
 
@@ -819,6 +819,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUError
 	const int Symmetry,
 	float *fparam,
 	int *iparam,
+	bool isExactPresent,
 	float *errorConv,
 	float *errorExact,
 	float *VPotentialExact //allocation in the client
@@ -859,16 +860,16 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUError
 
 	// variables passed from ALIROOT
 	float gridSizeR		= fparam[0];
-	//float gridSizePhi	= fparam[1];
-	//float gridSizeZ		= fparam[2];
-	float ratioPhi			= fparam[3];
-	float ratioZ			= fparam[4];
-	float convErr			= fparam[5];
+	float gridSizePhi	= fparam[1];
+	float gridSizeZ		= fparam[2];
+	float ratioPhi		= fparam[3];
+	float ratioZ		= fparam[4];
+	float convErr		= fparam[5];
 	float IFCRadius		= fparam[6];
-	int nPre					= iparam[0];
-	int nPost				= iparam[1];
-	int maxLoop				= iparam[2];
-	int nCycle				= iparam[3];
+	int nPre		= iparam[0];
+	int nPost		= iparam[1];
+	int maxLoop		= iparam[2];
+	int nCycle		= iparam[3];
 
 	// variables for calculating GPU memory allocation
 	int grid_RRow;
@@ -982,7 +983,11 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUError
 	
 	// max exact
 	
-	float maxAbsExact = GetAbsMax(VPotentialExact, RRow * PhiSlice * ZColumn);
+	// float maxAbsExact = GetAbsMax(VPotentialExact, RRow * PhiSlice * ZColumn);
+	float maxAbsExact = 1.0;
+
+	if (isExactPresent == true)
+		maxAbsExact = GetAbsMax(VPotentialExact, RRow * PhiSlice * ZColumn);
 	dim3 error_BlockPerGrid((RRow < 16) ? 1 : (RRow / 16), (ZColumn < 16) ? 1 : (ZColumn / 16), PhiSlice);
 	dim3 error_ThreadPerBlock(16, 16);		
 
@@ -990,7 +995,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUError
 	for (int cycle = 0; cycle < nCycle; cycle++)
 	{
 		cudaMemcpy( temp_VPotential, d_VPotential, RRow * ZColumn * PhiSlice * sizeof(float), cudaMemcpyDeviceToHost );
-		errorExact[cycle] = GetErrorNorm2(temp_VPotential, VPotentialExact, RRow * PhiSlice,ZColumn, maxAbsExact); 
+		if (isExactPresent == true) errorExact[cycle] = GetErrorNorm2(temp_VPotential, VPotentialExact, RRow * PhiSlice,ZColumn, maxAbsExact); 
 
 
 		VCycleSemiCoarseningGPU(d_VPotential, d_RhoChargeDensity, d_DeltaResidue, d_coef1, d_coef2, d_coef3, d_coef4, d_icoef4, gridSizeR, ratioZ, ratioPhi, RRow, ZColumn, PhiSlice, gridFrom, gridTo, nPre, nPost);
@@ -1003,7 +1008,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUError
 
 		errorConv[cycle] = *EpsilonError  / (RRow * ZColumn * PhiSlice);
 
-		if (((*EpsilonError) / (RRow * ZColumn * PhiSlice)) < convErr)
+		if (errorConv[cycle] < convErr)
 		{
 			//errorConv
 			nCycle = cycle;
@@ -1701,7 +1706,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorWCycle
 
 		errorConv[cycle] = *EpsilonError  / (RRow * ZColumn * PhiSlice);
 
-		if (((*EpsilonError) / (RRow * ZColumn * PhiSlice)) < convErr)
+		if (errorConv[cycle] < convErr)
 		{
 			//errorConv
 			nCycle = cycle;
@@ -1758,6 +1763,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorFCycle
 	const int Symmetry,
 	float *fparam,
 	int *iparam,
+	bool isExactPresent,	
 	float *errorConv,
 	float *errorExact,
 	float *VPotentialExact //allocation in the client
@@ -1897,10 +1903,11 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorFCycle
 			// Copy original VPotential to tempPotential
 			memcpy(temp_VPotential,     VPotential, RRow * ZColumn * PhiSlice * sizeof(float));
 					
-		} else 
-		{
-			Restrict_Boundary(temp_VPotential, grid_RRow, grid_ZColumn, PhiSlice, grid_StartPos);
-		}
+		} 
+		// else 
+		//{
+		//	Restrict_Boundary(temp_VPotential, grid_RRow, grid_ZColumn, PhiSlice, grid_StartPos);
+		//}
 
 		
 		coef_StartPos += grid_RRow;
@@ -1954,7 +1961,10 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorFCycle
 	
 	// max exact
 	
-	float maxAbsExact = GetAbsMax(VPotentialExact, RRow * PhiSlice * ZColumn);
+	float maxAbsExact = 1.0;
+
+	if (isExactPresent == true)
+		maxAbsExact = GetAbsMax(VPotentialExact, RRow * PhiSlice * ZColumn);
 	
 	
 
@@ -2007,7 +2017,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorFCycle
 		// restrict boundary (already done in cpu)
 ///		cudaMemcpy( temp_VPotential, d_RhoChargeDensity + grid_StartPos , grid_RRow * grid_ZColumn * PhiSlice * sizeof(float), cudaMemcpyDeviceToHost );
 //		PrintMatrix(temp_VPotential,grid_RRow * PhiSlice,grid_ZColumn);
-		// restriction2DFull<<< grid_BlockPerGrid, grid_ThreadPerBlock >>>( d_VPotential, d_VPotential, grid_RRow, grid_ZColumn, grid_PhiSlice );
+		restriction2DFull<<< grid_BlockPerGrid, grid_ThreadPerBlock >>>( d_VPotential, d_VPotential, grid_RRow, grid_ZColumn, grid_PhiSlice );
 
 		
 	}
@@ -2072,6 +2082,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorFCycle
 
 		prolongation2DHalfNoAdd<<< grid_BlockPerGrid, grid_ThreadPerBlock >>>( d_VPotential, grid_RRow, grid_ZColumn, grid_PhiSlice );
 
+
 		
 
 		// just 
@@ -2079,7 +2090,10 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorFCycle
 		// max exact
 		cudaMemcpy( d_VPotentialPrev + grid_StartPos, d_VPotential + grid_StartPos, grid_RRow * grid_ZColumn * PhiSlice * sizeof(float), cudaMemcpyDeviceToDevice );
 				
-		float maxAbsExact = GetAbsMax(VPotentialExact, RRow * PhiSlice * ZColumn);
+		float maxAbsExact = 1.0;
+
+		if (isExactPresent == true)
+			maxAbsExact = GetAbsMax(VPotentialExact, RRow * PhiSlice * ZColumn);
 		dim3 error_BlockPerGrid((grid_RRow < 16) ? 1 : (grid_RRow / 16), (grid_ZColumn < 16) ? 1 : (grid_ZColumn / 16), PhiSlice);
 		dim3 error_ThreadPerBlock(16, 16);		
 
@@ -2091,7 +2105,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorFCycle
 				
 			if (step == gridFrom) {
 				cudaMemcpy( temp_VPotential, d_VPotential, RRow * ZColumn * PhiSlice * sizeof(float), cudaMemcpyDeviceToHost );
-				errorExact[cycle] = GetErrorNorm2(temp_VPotential, VPotentialExact, RRow * PhiSlice,ZColumn, maxAbsExact); 
+				if (isExactPresent == true )errorExact[cycle] = GetErrorNorm2(temp_VPotential, VPotentialExact, RRow * PhiSlice,ZColumn, maxAbsExact); 
 			}
 
 
@@ -2112,7 +2126,7 @@ extern "C" void PoissonMultigrid3DSemiCoarseningGPUErrorFCycle
 				
 				errorConv[cycle] = *EpsilonError  / (grid_RRow * grid_ZColumn * PhiSlice);
 
-				if (((*EpsilonError) / (RRow * ZColumn * PhiSlice)) < convErr)
+				if (errorConv[cycle]< convErr)
 				{
 					nCycle = cycle;			
 					break;
