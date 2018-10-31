@@ -38,5 +38,4 @@ set(BUILD_SHARED_LIBS ON)
 list(APPEND CUDA_NVCC_FLAGS)
 
 add_subdirectory (gpulib)
-add_subdirectory (gpuapp)
 

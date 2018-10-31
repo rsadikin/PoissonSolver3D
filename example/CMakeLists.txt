@@ -44,5 +44,36 @@ INCLUDE_DIRECTORIES(
 set(CPP_SOURCE PoissonSolver3DGPUTest.cpp)
 set(HEADERS PoissonSolver3DGPUTest.h)
 
-add_executable(poissonsolvergputest  ${CPP_SOURCE} ${PSLIB})
-install(TARGETS poissonsolvergputest  DESTINATION bin)
+enable_testing()
+set(TARGET_NAME poissonsolvergputest)
+
+
+#set(UNIT_TEST_LIST
+#  poissonsolver)
+
+#foreach(NAME IN LISTS UNIT_TEST_LIST)
+#  list(APPEND UNIT_TEST_SOURCE_LIST ${NAME}.test.cpp)
+#endforeach()
+
+
+
+
+add_executable(${TARGET_NAME}
+  PoissonSolver3DGPUTest.cpp
+  #main.cpp
+  #${UNIT_TEST_SOURCE_LIST}
+)
+
+target_link_libraries(${TARGET_NAME} ${PSLIB} ${LIBCUDA_SO_PATH})
+install(TARGETS ${TARGET_NAME}  DESTINATION bin)
+#target_link_libraries(${TARGET_NAME}
+#  PUBLIC string_utils)i
+
+
+#target_include_directories(${TARGET_NAME}
+#  PUBLIC external/catch2/)
+
+#add_test(
+#  NAME ${TARGET_NAME}
+#  COMMAND ${TARGET_NAME} -o report.xml -r junit)
+
