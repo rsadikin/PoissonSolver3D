@@ -1,15 +1,45 @@
-# MakeLists files in this project can
-# refer to the root source directory of the project as ${HELLO_SOURCE_DIR} and
-# to the root binary directory of the project as ${HELLO_BINARY_DIR}.
+# For example the framework can run without GEANT4, but ROOT is
+# mandatory
+
+
+# **************************************************************************
+# * Copyright(c) 1998-2014, ALICE Experiment at CERN, All rights reserved. *
+# *                                                                        *
+# * Author: The ALICE Off-line Project.                                    *
+# * Contributors are mentioned in the code where appropriate.              *
+# *                                                                        *
+# * Permission to use, copy, modify and distribute this software and its   *
+# * documentation strictly for non-commercial purposes is hereby granted   *
+# * without fee, provided that the above copyright notice appears in all   *
+# * copies and that both the copyright notice and this permission notice   *
+# * appear in the supporting documentation. The authors make no claims     *
+# * about the suitability of this software for any purpose. It is          *
+# * provided "as is" without express or implied warranty.                  *
+# **************************************************************************
+
+# Module
 cmake_minimum_required (VERSION 2.8.11)
 project (3DPoissonSolverGPU)
 
-# Recurse into the "Hello" and "Demo" subdirectories. This does not actually
-# cause another cmake executable to run. The same process will walk through
-# the project's entire directory structure.
+find_package(CUDA)
+if(NOT CUDA_FOUND)
+    message( FATAL_ERROR "NVIDIA CUDA package not found. Please install or set SC_CUDA=OFF" )
+else()
+    find_library(LIBCUDA_SO_PATH libcuda.so)
+    string(FIND ${LIBCUDA_SO_PATH} "-NOTFOUND" LIBCUDA_SO_PATH_NOTFOUND )
+endif(NOT CUDA_FOUND)
+message( STATUS "Building SpaceCharge distortion framework with CUDA support" )
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/cuda" ${CMAKE_MODULE_PATH})
-find_package(CUDA QUIET REQUIRED)
+if(LIBCUDA_SO_PATH_NOTFOUND GREATER -1)
+  message( FATAL_ERROR "NVIDIA CUDA libcuda.so not found. Please install or set SC_CUDA=OFF" )
+endif(LIBCUDA_SO_PATH_NOTFOUND GREATER -1)
+
+#set nvcc flags
+set(CUDA_NVCC_FLAGS -Wno-deprecated-gpu-targets --use_fast_math --maxrregcount 64 -O4 -Xcompiler -fPIC -Xptxas -O4 -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=sm_35 -gencode arch=compute_52,code=sm_52 -gencode arch=compute_61,code=sm_61 -gencode arch=compute_60,code=sm_60)
+
+#for convenience
+
+
 find_package(Doxygen)
 
 if (DOXYGEN_FOUND)
@@ -33,9 +63,55 @@ endif (DOXYGEN_FOUND)
 
 
 
-set(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE OFF)
-set(BUILD_SHARED_LIBS ON)
-list(APPEND CUDA_NVCC_FLAGS)
 
-add_subdirectory (gpulib)
 
+# Module include folder
+include_directories(.
+                    interface
+                    kernel
+                   )
+
+
+#compile CUDA object file
+cuda_compile(SCGPU_O kernel/PoissonSolver3DGPU.cu)
+
+
+
+#set it back
+if(STDCXX11FOUND GREATER -1)
+  string ( REPLACE "-std=c++98" "-std=c++11" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" )
+endif()
+#end of CUDA specific stuff; from here on build usual library
+
+
+# Sources in alphabetical order
+set(SRCS
+    interface/PoissonSolver3DCylindricalGPU.cxx
+    ${SCGPU_O}
+   )
+
+# Headers from sources
+set(CINTHDRS
+    interface/PoissonSolver3DCylindricalGPU.h
+    )
+  
+set(HDRS
+    ${CINTHDRS}
+    kernel/PoissonSolver3DGPU.h
+  )
+
+enable_testing()
+set(TARGET_NAME poissonsolvergpu)
+
+
+add_library(${TARGET_NAME} SHARED ${SRCS})
+target_link_libraries(${TARGET_NAME} ${CUDA_LIBRARIES} ${LIBCUDA_SO_PATH})
+
+set_target_properties(${TARGET_NAME} PROPERTIES COMPILE_FLAGS "")
+
+# Installation
+install(TARGETS ${TARGET_NAME}
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib)
+
+install(FILES ${HDRS} DESTINATION include)

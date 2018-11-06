@@ -20,7 +20,9 @@ endif(LIBCUDA_SO_PATH_NOTFOUND GREATER -1)
 
 #set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/cuda" ${CMAKE_MODULE_PATH})
 #find_package(CUDA QUIET REQUIRED)
-find_library(PSLIB libPoissonSolver3DGPU.so)
+set(PSLIBNAME libPoissonSolver3DGPU.so)
+
+find_library(PSLIB ${PSLIBNAME})
 string(FIND ${PSLIB} "-NOTFOUND" PSLIB_NOTFOUND )
 
 if(PSLIB_NOTFOUND GREATER -1)
