@@ -23,15 +23,15 @@ project (3DPoissonSolverGPU)
 
 find_package(CUDA)
 if(NOT CUDA_FOUND)
-    message( FATAL_ERROR "NVIDIA CUDA package not found. Please install or set SC_CUDA=OFF" )
+    message( FATAL_ERROR "NVIDIA CUDA package not found" )
 else()
     find_library(LIBCUDA_SO_PATH libcuda.so)
     string(FIND ${LIBCUDA_SO_PATH} "-NOTFOUND" LIBCUDA_SO_PATH_NOTFOUND )
 endif(NOT CUDA_FOUND)
-message( STATUS "Building SpaceCharge distortion framework with CUDA support" )
+message( STATUS "Building PoissonSolver3D Cylindrical Multigrid  with CUDA support" )
 
 if(LIBCUDA_SO_PATH_NOTFOUND GREATER -1)
-  message( FATAL_ERROR "NVIDIA CUDA libcuda.so not found. Please install or set SC_CUDA=OFF" )
+  message( FATAL_ERROR "NVIDIA CUDA libcuda.so not found." )
 endif(LIBCUDA_SO_PATH_NOTFOUND GREATER -1)
 
 #set nvcc flags
