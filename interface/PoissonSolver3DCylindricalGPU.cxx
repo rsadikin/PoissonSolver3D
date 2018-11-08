@@ -1,4 +1,30 @@
-/// \author Rifki Sadikin <rifki.sadikin@lipi.go.id>, Indonesian Institute of Sciences
+
+/**************************************************************************
+ * Copyright(c) 2018,							  *	
+ * Kelompok penelitian komputasi berkinerja tinggi			  *
+ * Pusat Penelitian Informatika						  *
+ * Lembaga Ilmu Pengetahuan Indonesia 					  *
+ * All rights reserved. 						  *
+ *                                                                        *
+ * Contributors are mentioned in the code where appropriate.              *
+ *                                                                        *
+ * Permission to use, copy, modify and distribute this software and its   *
+ * documentation strictly for non-commercial purposes is hereby granted   *
+ * without fee, provided that the above copyright notice appears in all   *
+ * copies and that both the copyright notice and this permission notice   *
+ * appear in the supporting documentation. The authors make no claims     *
+ * about the suitability of this software for any purpose. It is          *
+ * provided "as is" without express or implied warranty.                  *
+ **************************************************************************/
+
+
+/// \class PoissonSolver3DCylindricalGPU
+/// \brief Kelas ini merupakan interface PoissonSolver 3D dalam koordinat silindrikal 
+/// yang diterapkan pada NVDIA Cuda
+///
+///
+///
+/// \author Rifki Sadikin <rifki.sadikin@cern.ch>, Indonesian Institute of Sciences
 /// \date Nov 8, 2018
 
 #include <math.h>
@@ -41,7 +67,21 @@ PoissonSolver3DCylindricalGPU::~PoissonSolver3DCylindricalGPU() {
 	delete fExactSolutionF;
 }
 
-/// function overriding
+/// Menyediakan solusi iteratif terhadap poisson solver pada koordinat silindrikal 3D
+///
+/// Disediakan algoritma iteratif
+/// * Geometric MultiGrid
+///		* Cycles: V, W, Full
+///		* Relaxation: Gauss-Seidel
+///		* Grid transfer operators: Full, Half
+///
+/// \param matricesV  float *  potential dalam array 1D berukuran nRRow*nZColumn *phiSlice
+/// \param matricesCharge float * charge dalam array 1D berukuran nRRow*nZColumn *phiSlice 
+/// \param nRRow int jumlah titik grid pada arah radial
+/// \param nZColumn int jumlah titik grid pada arah z
+/// \param phiSlice int jumlah titik grid pada arah sudut (phi)
+/// \param maxIteration int jumlah iterasi maksimum pada multigrud
+/// \param symmetry int nilai simetri (tidak dipakai)
 void PoissonSolver3DCylindricalGPU::PoissonSolver3D(float *matricesV, float *matricesCharge,
                                           int nRRow, int nZColumn, int phiSlice, int maxIteration,
                                           int symmetry) {
@@ -56,7 +96,23 @@ void PoissonSolver3DCylindricalGPU::PoissonSolver3D(float *matricesV, float *mat
 }
 
 
-// method to do multigrid3d2d
+/// Penyelesaian Poisson problem dalam 3D Silindrikal dengan coarsening hanya pada arah z dan radial
+///
+/// Syarat:
+///    R Row       ==  2**M + 1
+///    Z Column  ==  2**N + 1
+///    Phi Slice  ==  Sembarang lebih besar > 3
+///
+///		 Menyelesaikan: \f$  \nabla^{2}V(r,\phi,z) = - f(r,\phi,z) \f$
+///
+///
+/// \param matricesV  float *  potential dalam array 1D berukuran nRRow*nZColumn *phiSlice
+/// \param matricesCharge float * charge dalam array 1D berukuran nRRow*nZColumn *phiSlice 
+/// \param nRRow int jumlah titik grid pada arah radial
+/// \param nZColumn int jumlah titik grid pada arah z
+/// \param phiSlice int jumlah titik grid pada arah sudut (phi)
+/// \param maxIteration int jumlah iterasi maksimum pada multigrud
+/// \param symmetry int nilai simetri (tidak dipakai)
 void PoissonSolver3DCylindricalGPU::PoissonMultiGrid3D2D(float *VPotential, float * RhoChargeDensities, int nRRow,
                                                int nZColumn, int phiSlice, int symmetry) {
 
@@ -112,8 +168,12 @@ void PoissonSolver3DCylindricalGPU::PoissonMultiGrid3D2D(float *VPotential, floa
 	delete[] iparam;
 }
 
-
-
+/// Helper untuk menset nilai V dari fungsi analitik (diperlukan untuk memastikan implementasi benar
+/// \param exactSolution float * array 1D sebesar nRRow * nZColumn * phiSlice
+///
+/// \param nRRow int jumlah titik grid pada arah radial
+/// \param nZColumn int jumlah titik grid pada arah z
+/// \param phiSlice int jumlah titik grid pada arah sudut (phi)
 void PoissonSolver3DCylindricalGPU::SetExactSolution(float*exactSolution,int nRRow, int nZColumn, int phiSlice) {
   	fNRRow = nRRow;
   	fNZColumn = nZColumn;

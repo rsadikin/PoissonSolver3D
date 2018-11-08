@@ -12,7 +12,7 @@
 ///
 /// \author Rifki Sadikin <rifki.sadikin@lipi.go.id>, Pusat Penelitian Informatika, Lembaga Ilmu Pengetahuan Indonesia
 /// \author I Wayan Aditya Swardiana  <i.wayan.aditya.swardiana@lipi.go.id>, Pusat Penelitian Informatika, Lembaga Ilmu Pengetahuan Indonesia
-/// \date Mar 4, 2015
+/// \date November 8, 2018
 
 
 

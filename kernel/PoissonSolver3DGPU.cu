@@ -1,3 +1,22 @@
+
+/**************************************************************************
+ * Copyright(c) 2018,							  *	
+ * Kelompok penelitian komputasi berkinerja tinggi			  *
+ * Pusat Penelitian Informatika						  *
+ * Lembaga Ilmu Pengetahuan Indonesia 					  *
+ * All rights reserved. 						  *
+ *                                                                        *
+ * Contributors are mentioned in the code where appropriate.              *
+ *                                                                        *
+ * Permission to use, copy, modify and distribute this software and its   *
+ * documentation strictly for non-commercial purposes is hereby granted   *
+ * without fee, provided that the above copyright notice appears in all   *
+ * copies and that both the copyright notice and this permission notice   *
+ * appear in the supporting documentation. The authors make no claims     *
+ * about the suitability of this software for any purpose. It is          *
+ * provided "as is" without express or implied warranty.                  *
+ **************************************************************************/
+
 #include "PoissonSolver3DGPU.h"
 #include <cuda.h>
 #include <math.h>
