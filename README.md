@@ -1,6 +1,8 @@
 # PoissonSolver3DCylindricalGPU
 
-PoissonSolver3D adalah pustaka yang dikembangkan untuk menyelesaikan persamaan Poisson 3 dimensi dalam sistem koordinat silinder. Persamaan Poisson secara umum  berbentuk $$\nabla^{2}(r,\phi,z) = \rho(r,\phi,z)$$ dengan diketahui nilai tepi pada potensial $$\mathbf{V}$$ dan distribusi buatan $$\rho$$. Untuk menyelesaikan persamaan tersebut digunakan metode multigrid yang diimplementasikan pada akselerator GPU.
+PoissonSolver3D adalah pustaka yang dikembangkan untuk menyelesaikan persamaan Poisson 3 dimensi dalam sistem koordinat silinder. Persamaan Poisson secara umum  berbentuk $$\nabla^{2}(r,\phi,z) = \rho(r,\phi,z)$$ dengan diketahui nilai tepi pada potensial $$\mathbf{V}$$ dan distribusi buatan $$\rho$$. 
+
+Untuk menyelesaikan persamaan tersebut digunakan metode multigrid yang diimplementasikan pada akselerator GPU.
 
 ## Pengembang
 
