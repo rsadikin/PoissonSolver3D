@@ -17,6 +17,13 @@
  * provided "as is" without express or implied warranty.                  *
  **************************************************************************/
 
+/// \file PoissonSolver3DGPU.cu
+/// \brief Berkas ini berisi implementasi kernel dalam cuda untuk PoissonSolver Cylindrical berbasis Multigrid
+///
+/// \author Rifki Sadikin <rifki.sadikin@lipi.go.id>, Pusat Penelitian Informatika, Lembaga Ilmu Pengetahuan Indonesia
+/// \author I Wayan Aditya Swardiana  <i.wayan.aditya.swardiana@lipi.go.id>, Pusat Penelitian Informatika, Lembaga Ilmu Pengetahuan Indonesia
+/// \date November 8, 2018
+
 #include "PoissonSolver3DGPU.h"
 #include <cuda.h>
 #include <math.h>

@@ -6,12 +6,12 @@
 #include <ctime>
 
 #include "PoissonSolver3DGPUTest.h"
-///
-/// DoPoissonSolverExperiments
+/// \file berkas PoissonSolver3DGPUTest.cpp berisi implementasi pengujian pustaka PoissonSolver3DCylindricalGPU
 ///
 /// dibuat oleh: Rifki Sadikin (rifki.sadikin@lipi.go.id)
 /// tanggal: 7 November 2018
 
+/// Lakukan eksperimen poisson solver
 void DoPoissonSolverExperiment(const int kRows, const int kColumns, const int kPhiSlices,  const int kIterations, const int kSymmetry)   {
 		
 	
@@ -130,7 +130,7 @@ void DoPoissonSolverExperiment(const int kRows, const int kColumns, const int kP
 
 
 
-// set init
+/// Inisisasi nilai volt dan charge
 void InitVoltandCharge3D(float * VPotentialExact,float *VPotential,float * RhoCharge,const int kRows, const int kColumns,const int kPhiSlices,float gridSizeR,float gridSizeZ,float gridSizePhi) {
 
   //TFormula vTestFunction1("f1", "[0]*(x^4 - 338.0 *x^3 + 21250.75 * x^2)*cos([1]* y)^2*exp(-1* [2] * z^2)");
@@ -176,7 +176,7 @@ c = 1e-4;
 	
 }
 
-//
+/// analytic function untuk potensial
 float TestFunction1PotentialEval(double a, double b, double  c, float radius0,float phi0,float z0) {
 	
   //TFormula vTestFunction1("f1", "[0]*(x^4 - 338.0 *x^3 + 21250.75 * x^2)*cos([1]* y)^2*exp(-1* [2] * z^2)");
@@ -185,7 +185,8 @@ float TestFunction1PotentialEval(double a, double b, double  c, float radius0,fl
 
 	return ret;
 }			
-//
+
+/// analytic function untuk charge
 float TestFunction1ChargeEval(double a, double b, double  c, float radius0,float phi0,float z0) {
 	
   //TFormula rhoTestFunction1("ff1", "[0]*(((16.0 * x^2 - 9.0 * 338.0 * x + 4.0*21250.75) *cos([1] * y)^2 * exp(-1 *[2]*z^2)) - ((x^2 -  338.0 * x + 21250.75) * 2 * [1]^2 * cos(2 * [1] * y) * exp(-1 *[2]*z^2)) + ((x^4 -  338.0 * x^3 + 21250.75 * x^2) * cos([1] * y)^2 * (4*[2]^2*z^2 - 2 * [2]) * exp(-1 *[2]*z^2)))");
@@ -195,7 +196,7 @@ float TestFunction1ChargeEval(double a, double b, double  c, float radius0,float
 }			
 	
 	
-// testing
+// fungsi main untuk test
 int main() {
 
 	

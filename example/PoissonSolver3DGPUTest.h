@@ -1,3 +1,10 @@
+
+/// \file PoissonSolver3DGPUTEst.h
+/// \brief Berkas ini berisi definisi fungs untuk memakai pustaka libPoissonSolver3DCylindrialGPU.so
+///
+/// \author Rifki Sadikin <rifki.sadikin@lipi.go.id>, Pusat Penelitian Informatika, Lembaga Ilmu Pengetahuan Indonesia
+/// \author I Wayan Aditya Swardiana  <i.wayan.aditya.swardiana@lipi.go.id>, Pusat Penelitian Informatika, Lembaga Ilmu Pengetahuan Indonesia
+/// \date November 8, 2018
 #ifndef POISSONSOLVERGPU3DGPUTEST_H
 #define POISSONSOLVERGPU3DGPUTEST_H
 
