@@ -867,7 +867,7 @@ FILTER_SOURCE_PATTERNS =
 # and want to reuse the introduction page also for the doxygen output.
 
 
-USE_MDFILE_AS_MAINPATE		   = README.md	
+USE_MDFILE_AS_MAINPAGE		   = README.md	
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
 #---------------------------------------------------------------------------
