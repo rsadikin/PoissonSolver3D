@@ -235,7 +235,6 @@ $ make
 [100%] Built target poissonsolvergputest
 ```  
 5. Hasil dari **make** adalah program yang dapat dieksekusi yang berjalan di GPU card
-6.
 ```console
 $ ./poissonsolvergputest
 Poisson Solver 3D Cylindrical GPU test

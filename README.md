@@ -17,4 +17,6 @@ http://grid.lipi.go.id
 
 ## Dokumentasi
 
-Petunjuk penggunaan dapat dilihat pada berkas PetunjukPenggunaan.md
+Petunjuk penggunaan dapat dilihat pada berkas 
+[PETUNJUKPENGGUNAAN.md](PETUNJUKPENGGUNAAN.md)
+
