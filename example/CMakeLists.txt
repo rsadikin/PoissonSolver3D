@@ -20,62 +20,33 @@ endif(LIBCUDA_SO_PATH_NOTFOUND GREATER -1)
 
 #set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/cuda" ${CMAKE_MODULE_PATH})
 #find_package(CUDA QUIET REQUIRED)
-set(PSLIBNAME libPoissonSolver3DGPU.so)
+set(PSLIBNAME libPoissonSolver3DCylindricalGPU.so)
 
 find_library(PSLIB ${PSLIBNAME})
 string(FIND ${PSLIB} "-NOTFOUND" PSLIB_NOTFOUND )
 
 if(PSLIB_NOTFOUND GREATER -1)
-  message( FATAL_ERROR "Poisson Solver Cuda Library libPoissonSolver3DGPU.so not found" )
+  message( FATAL_ERROR "Poisson Solver Cuda Library libPoissonSolver3DCylindricalGPU.so not found" )
 endif(PSLIB_NOTFOUND GREATER -1)
-#set(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE OFF)
-# set(BUILD_SHARED_LIBS ON)
-#list(APPEND CUDA_NVCC_FLAGS)
-
-
-#cuda_add_executable(poissonsolvertest 
-#	PoissonSolver3DGPUTest.cpp
-#i)
-# add_executable(poissonsolvergputest PoissonSolver3DGPUTest.cpp ${PSLIB})
-# install(TARGETS poissonsolvergputest  DESTINATION bin)
-
 
 INCLUDE_DIRECTORIES(
 	${CMAKE_PREFIX_PATH}/include
 ) 
+
+
+# tambah disini kode sumber user
 set(CPP_SOURCE PoissonSolver3DGPUTest.cpp)
 set(HEADERS PoissonSolver3DGPUTest.h)
 
-enable_testing()
 set(TARGET_NAME poissonsolvergputest)
-
-
-#set(UNIT_TEST_LIST
-#  poissonsolver)
-
-#foreach(NAME IN LISTS UNIT_TEST_LIST)
-#  list(APPEND UNIT_TEST_SOURCE_LIST ${NAME}.test.cpp)
-#endforeach()
-
-
-
 
 add_executable(${TARGET_NAME}
   PoissonSolver3DGPUTest.cpp
-  #main.cpp
-  #${UNIT_TEST_SOURCE_LIST}
 )
 
+
+# ikut sertakan shared library cuda dan poisson solver
 target_link_libraries(${TARGET_NAME} ${PSLIB} ${LIBCUDA_SO_PATH})
-install(TARGETS ${TARGET_NAME}  DESTINATION bin)
-#target_link_libraries(${TARGET_NAME}
-#  PUBLIC string_utils)i
 
 
-#target_include_directories(${TARGET_NAME}
-#  PUBLIC external/catch2/)
-
-#add_test(
-#  NAME ${TARGET_NAME}
-#  COMMAND ${TARGET_NAME} -o report.xml -r junit)
 

@@ -1,9 +1,23 @@
-/// \author Rifki Sadikin <rifki.sadikin@cern.ch>, Indonesian Institute of Sciences
-/// \date Nov 20, 2017
+/// \author Rifki Sadikin <rifki.sadikin@lipi.go.id>, Indonesian Institute of Sciences
+/// \date Nov 8, 2018
 
 #include <math.h>
 #include "PoissonSolver3DCylindricalGPU.h"
 
+const float PoissonSolver3DCylindricalGPU::fgkTPCZ0 = 249.7;     ///< nominal gating grid position
+const float PoissonSolver3DCylindricalGPU::fgkIFCRadius = 83.5;     ///< radius which renders the "18 rod manifold" best -> compare calc. of Jim Thomas
+const float PoissonSolver3DCylindricalGPU::fgkOFCRadius = 254.5;     ///< Mean Radius of the Outer Field Cage (252.55 min, 256.45 max) (cm)
+const float PoissonSolver3DCylindricalGPU::fgkZOffSet = 0.2;     ///< Offset from CE: calculate all distortions closer to CE as if at this point
+const float PoissonSolver3DCylindricalGPU::fgkCathodeV = -100000.0; ///< Cathode Voltage (volts)
+const float PoissonSolver3DCylindricalGPU::fgkGG = -70.0; ///< Gating Grid voltage (volts)
+const float PoissonSolver3DCylindricalGPU::fgkdvdE = 0.0024; ///< [cm/V] drift velocity dependency on the E field (from Magboltz for NeCO2N2 at standard environment)
+const float PoissonSolver3DCylindricalGPU::fgkEM = -1.602176487e-19 / 9.10938215e-31; ///< charge/mass in [C/kg]
+const float PoissonSolver3DCylindricalGPU::fgke0 = 8.854187817e-12;                 ///< vacuum permittivity [A·s/(V·m)]
+
+float PoissonSolver3DCylindricalGPU::fgExactErr = 1e-4;
+float PoissonSolver3DCylindricalGPU::fgConvergenceError = 1e-3;
+
+/// constructor
 ///
 PoissonSolver3DCylindricalGPU::PoissonSolver3DCylindricalGPU() {
 

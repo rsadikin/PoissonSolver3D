@@ -101,7 +101,7 @@ set(HDRS
   )
 
 enable_testing()
-set(TARGET_NAME poissonsolvergpu)
+set(TARGET_NAME PoissonSolver3DCylindricalGPU)
 
 
 add_library(${TARGET_NAME} SHARED ${SRCS})

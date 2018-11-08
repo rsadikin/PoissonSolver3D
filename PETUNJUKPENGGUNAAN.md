@@ -126,10 +126,94 @@ $ make
 ```console
 $ make install
 ..
-Install the project...
 -- Install configuration: ""
--- Installing: /home/usertest/buildpoissonsolver/lib/libpoissonsolvergpu.so
--- Installing: /home/usertest/buildpoissonsolver/include/PoissonSolver3DCylindricalGPU.h
--- Installing: /home/usertest/buildpoissonsolver/include/PoissonSolver3DGPU.h
+-- Installing: /home/usertest/trypoissonsolver/buildpoissonsolver/lib/libPoissonSolver3DCylindricalGPU.so
+-- Installing: /home/usertest/trypoissonsolver/buildpoissonsolver/include/PoissonSolver3DCylindricalGPU.h
+-- Installing: /home/usertest/trypoissonsolver/buildpoissonsolver/include/PoissonSolver3DGPU.h
 ```
 
+Hasil instalasi adalah sebuah pustaka yang dapat digunakan (**shared library**) yaitu libPoissonSolver3DCylindricalGPU.so pada direktori **lib** dan 2 berkas header yang mengandung definisi kelas /fungsi sehingga pengguna pustaka dapat menggunakannya.
+
+## Penggunaan Pustaka 
+
+### Penggunaan Dalam CMAKE 
+
+Dalam folder **example** di struktur direktori sumber terdapat contoh penggunaan pustaka libpoissonsolvergpu.so dengan menggunakan **cmake**. Berikut ini langkah-langkahnya:
+
+1. Buat file **CMakeLists.txt** dengan struktur sebagai berikut untuk menambahkan pustaka cuda (**libcuda.so**) dan pustaka PoissonSolver3DCylindricalGPU (**libPoissonSolver3DCylindricalGPU.so**) pada proyek cmake:
+
+
+
+```cmake
+cmake_minimum_required (VERSION 2.8.11)
+project (3DPoissonSolverGPUTest)
+
+find_package(CUDA)
+if(NOT CUDA_FOUND)
+    message( FATAL_ERROR "NVIDIA CUDA package not found" )
+else()
+    find_library(LIBCUDA_SO_PATH libcuda.so)
+    string(FIND ${LIBCUDA_SO_PATH} "-NOTFOUND" LIBCUDA_SO_PATH_NOTFOUND )
+endif(NOT CUDA_FOUND)
+message( STATUS "Building Poisson Solver  with CUDA support" )
+
+if(LIBCUDA_SO_PATH_NOTFOUND GREATER -1)
+  message( FATAL_ERROR "NVIDIA CUDA libcuda.so not found" )
+endif(LIBCUDA_SO_PATH_NOTFOUND GREATER -1)
+
+
+#set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/cuda" ${CMAKE_MODULE_PATH})
+#find_package(CUDA QUIET REQUIRED)
+set(PSLIBNAME libPoissonSolver3DCylindricalGPU.so)
+
+find_library(PSLIB ${PSLIBNAME})
+string(FIND ${PSLIB} "-NOTFOUND" PSLIB_NOTFOUND )
+
+if(PSLIB_NOTFOUND GREATER -1)
+  message( FATAL_ERROR "Poisson Solver Cuda Library libPoissonSolver3DCylindricalGPU.o not found" )
+endif(PSLIB_NOTFOUND GREATER -1)
+
+```
+Setelah itu, baru tambahkan perintah pada CMakeLists.txt (dilanjutkan) untuk mengikut sertakan kode sumber user yaitu:
+
+```
+# tambah disini kode sumber user
+set(CPP_SOURCE PoissonSolver3DGPUTest.cpp)
+set(HEADERS PoissonSolver3DGPUTest.h)
+
+set(TARGET_NAME poissonsolvergputest)
+
+add_executable(${TARGET_NAME}
+  PoissonSolver3DGPUTest.cpp
+)
+
+
+# ikut sertakan shared library cuda dan poisson solver
+target_link_libraries(${TARGET_NAME} ${PSLIB} ${LIBCUDA_SO_PATH})
+```
+
+2. Buat folder terpisah untuk mebangun proyek yang menggunakan pustaka misal **buildexamplepoissonsolver** lalu jalankan **cmake** dengan flag spesial yaitu **-DCMAKE_PREFIX_PATH** yang ditetapkan dengan absolute path tempat direktori PoissonSolver3DCylindricalGPU dibangun.
+
+```console
+$ mkdir buildexamplepoissonsolver
+$ cd buildexamplepoissonsolver
+$ cmake ../PoissonSolver3D/example/ -DCMAKE_PREFIX_PATH=/home/usertest/trypoissonsolver/buildpoissonsolver
+...
+-- Found CUDA: /apps/tools/cuda-9.1 (found version "9.1")
+-- Building Poisson Solver  with CUDA support
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/usertest/trypoissonsolver/buildexamplepoissonsolver
+```
+3. Jalankan **make**  untuk membuat *executable file* 
+
+```console
+$ make
+
+-- Building Poisson Solver  with CUDA support
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/usertest/trypoissonsolver/buildexamplepoissonsolver
+[ 50%] Linking CXX executable poissonsolvergputest
+[100%] Built target poissonsolvergputest
+```  
