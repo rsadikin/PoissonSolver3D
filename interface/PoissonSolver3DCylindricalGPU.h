@@ -6,7 +6,7 @@
 /// \brief Kelas ini merupakan interface PoissonSolver 3D dalam koordinat silindrikal 
 /// yang diterapkan pada NVDIA Cuda
 ///
-/// \author Rifki Sadikin <rifki.sadikin@cern.ch>, Indonesian Institute of Sciences
+/// \author Rifki Sadikin <rifki.sadikin@lipi.go.id>, Indonesian Institute of Sciences
 /// \date Nov 20, 2017
 #include "PoissonSolver3DGPU.h"
 
@@ -76,15 +76,9 @@ public:
 
 
 
-  static const float fgkTPCZ0;       ///< nominal gating grid position
+  static const float fgkZ0;       ///< nominal gating grid position
   static const float fgkIFCRadius;   ///< Mean Radius of the Inner Field Cage ( 82.43 min,  83.70 max) (cm)
   static const float fgkOFCRadius;   ///< Mean Radius of the Outer Field Cage (252.55 min, 256.45 max) (cm)
-  static const float fgkZOffSet;     ///< Offset from CE: calculate all distortions closer to CE as if at this point
-  static const float fgkCathodeV;    ///< Cathode Voltage (volts)
-  static const float fgkGG;          ///< Gating Grid voltage (volts)
-  static const float fgkdvdE;        ///< [cm/V] drift velocity dependency on the E field (from Magboltz for NeCO2N2 at standard environment)
-  static const float fgkEM;          ///< charge/mass in [C/kg]
-  static const float fgke0;          ///< vacuum permittivity [A·s/(V·m)]
 
   static float fgExactErr; ///< Error tolerated
   static float fgConvergenceError; ///< Error tolerated
