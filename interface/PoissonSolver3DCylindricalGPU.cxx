@@ -90,7 +90,7 @@ void PoissonSolver3DCylindricalGPU::PoissonMultiGrid3D2D(float *VPotential, floa
 
 	if (fMgParameters.cycleType == kFCycle)
 	{
-		if (fExactPresent == true) { 
+		if (fExactPresent == true) {
 			PoissonMultigrid3DSemiCoarseningGPUErrorFCycle(VPotential, RhoChargeDensities,nRRow, nZColumn,phiSlice,symmetry, fparam, iparam, fExactPresent, fErrorConvF, fErrorExactF, fExactSolutionF);
 		} else {
 			PoissonMultigrid3DSemiCoarseningGPUErrorFCycle(VPotential, RhoChargeDensities,nRRow, nZColumn,phiSlice,symmetry, fparam, iparam, fExactPresent, fErrorConvF, fErrorExactF, NULL);
@@ -118,7 +118,7 @@ void PoissonSolver3DCylindricalGPU::SetExactSolution(float*exactSolution,int nRR
   	fNRRow = nRRow;
   	fNZColumn = nZColumn;
   	fPhiSlice = phiSlice;
-	fExactSolutionF = new float[fNRRow * fPhiSlice,fNZColumn];
+	fExactSolutionF = new float[fNRRow * fPhiSlice * fNZColumn];
 	fExactPresent = true;
 	fMaxExact = 0.0;;
 	for (int i=0;i<nRRow*nZColumn*phiSlice;i++) {

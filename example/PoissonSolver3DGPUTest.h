@@ -2,7 +2,7 @@
 #define POISSONSOLVERGPU3DGPUTEST_H
 
 #include <iostream>
-#include "PoissonSolver3DGPU.h"
+#include "PoissonSolver3DCylindricalGPU.h"
 
 const double fgkTPCZ0 = 249.7;     ///< nominal gating grid position
 const double fgkIFCRadius = 83.5;     ///< radius which renders the "18 rod manifold" best -> compare calc. of Jim Thomas

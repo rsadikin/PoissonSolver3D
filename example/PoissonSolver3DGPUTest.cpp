@@ -1,10 +1,17 @@
 #include <iostream>
 #include <math.h>
+
+#include <iostream>
+#include <cstdio>
+#include <ctime>
+
 #include "PoissonSolver3DGPUTest.h"
-#include "PoissonSolver3DGPU.h"
 ///
 /// DoPoissonSolverExperiments
 ///
+/// dibuat oleh: Rifki Sadikin (rifki.sadikin@lipi.go.id)
+/// tanggal: 7 November 2018
+
 void DoPoissonSolverExperiment(const int kRows, const int kColumns, const int kPhiSlices,  const int kIterations, const int kSymmetry)   {
 		
 	
@@ -26,6 +33,7 @@ void DoPoissonSolverExperiment(const int kRows, const int kColumns, const int kP
 	InitVoltandCharge3D(VPotentialExact,VPotential,RhoCharge,kRows,kColumns,kPhiSlices,gridSizeR,gridSizeZ,gridSizePhi);
 
 
+ /**
  	const float  ratioPhi    =  gridSizeR*gridSizeR / (gridSizePhi*gridSizePhi) ;  // ratio_{phi} = gridsize_{r} / gridsize_{phi}
   	const float  ratioZ      =  gridSizeR*gridSizeR / (gridSizeZ*gridSizeZ) ; // ratio_{Z} = gridsize_{r} / gridsize_{z}
 	const float  convErr 	   =  fgConvergenceError;
@@ -59,95 +67,65 @@ void DoPoissonSolverExperiment(const int kRows, const int kColumns, const int kP
 	// VCycle
 	PoissonMultigrid3DSemiCoarseningGPUError(VPotential, RhoCharge, kRows, kColumns ,kPhiSlices, 0 , fparam, iparam, true, errorConv,errorExact, VPotentialExact);
   	// Call poisson solver
-
-	
-	for (int k=0;k<kPhiSlices;k++) {
+**/
+	/**
+	for (int k=0;k<1;k++) {
 	for (int i=0;i<kRows;i++) {
-			for (int j=0;j< kColumns;j++) printf("%.3f\t",VPotential[k * (kRows * kColumns) + i * kColumns + j]  - VPotentialExact[k* (kRows * kColumns) + i * kColumns + j]);
+			for (int j=0;j< kColumns;j++) printf("%.3f\t",VPotentialExact[k* (kRows * kColumns) + i * kColumns + j]);
 			printf("\n");
 	}
 	printf("\n");
 	}
+ **/
 
-	/**
-	
-	TVectorD *error[5];
-	TVectorD *errorConv[5];
-	int iterations[5];
-	
-	// memory allocation 
-  	TMatrixD *arrayofArrayV[kPhiSlices], *arrayofCharge[kPhiSlices] ;
-	TMatrixD *arrayofArrayVGrid[kPhiSlices], *arrayofChargeGrid[kPhiSlices] ;
-	TMatrixD *arrayofArrayVExact[kPhiSlices];
-  
-  	for ( int k = 0 ; k < kPhiSlices ; k++ ) {
-    		arrayofArrayV[k]     =   new TMatrixD(kRows,kColumns) ;
-		arrayofArrayVExact[k]     =   new TMatrixD(kRows,kColumns) ;
-    		arrayofCharge[k]     =   new TMatrixD(kRows,kColumns) ;    
-		arrayofArrayVGrid[k]     =   new TMatrixD(kRows,kColumns) ;
-    		arrayofChargeGrid[k]     =   new TMatrixD(kRows,kColumns) ;    
-  	}
-
-
-	// side in TPC chamber
-	int side = 0;
-	
-	/// Generate exact problems -- solutios pair	
-	InitVoltandCharge3D(arrayofArrayVExact,arrayofChargeGrid,kRows,kColumns,kPhiSlices,side,gridSizeR,gridSizeZ,gridSizePhi,1);
-	
-	
-	/// zeroing potential for inital guess
-	for ( int k = 0 ; k < kPhiSlices ; k++ ) {		
-    *arrayofArrayVGrid[k]     =   *arrayofArrayVExact[k];
-		*arrayofArrayV[k] =  *arrayofArrayVExact[k];
-		for ( int i = 1 ; i < kRows-1 ; i++ ) {
-			for ( int j = 1 ; j < kColumns-1 ; j++ ) {
-			(*arrayofArrayVGrid[k])(i,j) = 0.0;
-			(*arrayofArrayV[k])(i,j) = 0.0;
-			}
-		}		
-	}
-	
   
 	// create poissonSolver
-	AliTPCPoissonSolverCuda *poissonSolver = new AliTPCPoissonSolverCuda();
+	PoissonSolver3DCylindricalGPU *poissonSolver = new PoissonSolver3DCylindricalGPU();
 	
-	AliTPCPoissonSolverCuda::fgConvergenceError = 1e-8;
+	PoissonSolver3DCylindricalGPU::fgConvergenceError = 1e-6;
 	// zeroring array of error
-	poissonSolver->SetExactSolution(arrayofArrayVExact,kRows,kColumns, kPhiSlices);
+	poissonSolver->SetExactSolution(VPotentialExact,kRows,kColumns, kPhiSlices);
 	
 	
 	
 	// Case 1. Set the strategy as multigrid, fullmultigrid, and full 3d
-	poissonSolver->SetStrategy(kMultiGrid);	
-	poissonSolver->SetCycleType(kFCycle);
+	poissonSolver->SetStrategy(PoissonSolver3DCylindricalGPU::kMultiGrid);	
+	poissonSolver->SetCycleType(PoissonSolver3DCylindricalGPU::kFCycle);
 
-	TStopwatch w; 
-	w.Start();
-	poissonSolver->PoissonSolver3D(arrayofArrayVGrid,arrayofChargeGrid,kRows,kColumns,kPhiSlices, kIterations,kSymmetry) ;
-	w.Stop();
+	// TStopwatch w;
+	std::clock_t start,stop;
+	double duration;
 
-	TMatrixD vError(kRows,kColumns);
-	arrayofArrayVGrid[0]->Print();
-
+    	start = std::clock();
+ 
+	//w.Start();
+	poissonSolver->PoissonSolver3D(VPotential,RhoCharge,kRows,kColumns,kPhiSlices, kIterations,kSymmetry) ;
+	//w.Stop();
+	stop = std::clock();
+	/**
+	for (int k=0;k<1;k++) {
+	for (int i=0;i<kRows;i++) {
+			for (int j=0;j< kColumns;j++) printf("%.3f\t",VPotential[k* (kRows * kColumns) + i * kColumns + j]);
+			printf("\n");
+	}
+	printf("\n");
+	}**/
 	
-	::Info("testAliTPCPoissonSolverMem3D_Consistency",Form("Time Poisson Multigrid F-Cycle 3D: = %f \n",w.CpuTime()));
+    	duration = ( stop - start ) / (double) CLOCKS_PER_SEC;
 
+	std::cout<<"Poisson Solver 3D Cylindrical GPU test" << '\n';
+	std::cout<<"Ukuran grid (r,phi,z) = (" << kRows << "," << kColumns << "," << kPhiSlices <<") \n";
+    	std::cout<<"Waktu komputasi: \t\t\t"<< duration <<" s \n";
+	std::cout<<"Jumlah iterasi siklus multigrid: \t"<< poissonSolver->fIterations << '\n';
+	std::cout<<"Iterasi\tError Convergen\t\tError Absolut \n";
+	std::cout<< std::scientific;
+	for (int i=0;i<poissonSolver->fIterations;i++) {
+		std::cout<<"[" <<  i  << "]:\t" << poissonSolver->GetErrorConv(i) << "\t" << poissonSolver->GetErrorExact(i) << '\n' << std::scientific;
+	}
 	delete poissonSolver;
-
-  	for ( int k = 0 ; k < kPhiSlices ; k++ ) {
-    		delete arrayofArrayV[k];
-		delete arrayofArrayVExact[k];
-    		delete arrayofCharge[k];    
-		delete arrayofArrayVGrid[k];
-    		delete arrayofChargeGrid[k];    
-  	}
-	**/
 	delete VPotential;
 	delete VPotentialExact;
 	delete RhoCharge;
-	delete[] iparam;
-	delete[] fparam;
 }
 
 
@@ -155,17 +133,15 @@ void DoPoissonSolverExperiment(const int kRows, const int kColumns, const int kP
 // set init
 void InitVoltandCharge3D(float * VPotentialExact,float *VPotential,float * RhoCharge,const int kRows, const int kColumns,const int kPhiSlices,float gridSizeR,float gridSizeZ,float gridSizePhi) {
 
+  //TFormula vTestFunction1("f1", "[0]*(x^4 - 338.0 *x^3 + 21250.75 * x^2)*cos([1]* y)^2*exp(-1* [2] * z^2)");
+  //TFormula rhoTestFunction1("ff1", "[0]*(((16.0 * x^2 - 9.0 * 338.0 * x + 4.0*21250.75) *cos([1] * y)^2 * exp(-1 *[2]*z^2)) - ((x^2 -  338.0 * x + 21250.75) * 2 * [1]^2 * cos(2 * [1] * y) * exp(-1 *[2]*z^2)) + ((x^4 -  338.0 * x^3 + 21250.75 * x^2) * cos([1] * y)^2 * (4*[2]^2*z^2 - 2 * [2]) * exp(-1 *[2]*z^2)))");
 		
   double  rlist[kRows], zedlist[kColumns] , philist[kPhiSlices];
   float phi0,radius0,z0;
   double a,b,c;
-  a = fgkOFCRadius*fgkOFCRadius;
-  a*= (fgkOFCRadius - fgkIFCRadius); 
-  a*= (fgkOFCRadius - fgkIFCRadius);
-  a =  (100.0/a);
-  b = 0.5;
-  c = M_E / (fgkTPCZ0 * fgkTPCZ0 );
- 
+a = 1e-7;
+b = 0.5;
+c = 1e-4; 
    int index;
 	// list points on grid in cm
   for ( int k = 0 ; k < kPhiSlices ; k++ ) 
@@ -186,7 +162,7 @@ void InitVoltandCharge3D(float * VPotentialExact,float *VPotential,float * RhoCh
 			z0 = zedlist[j];
 
 			VPotentialExact[index] = TestFunction1PotentialEval(a,b,c,radius0,phi0,z0);			
-			RhoCharge[index] = TestFunction1ChargeEval(a,b,c,radius0,phi0,z0);	
+			RhoCharge[index] = -1 * TestFunction1ChargeEval(a,b,c,radius0,phi0,z0);	
 			
 			if (j == 0) VPotential[index] = VPotentialExact[index];
 			else if (j == kColumns-1) VPotential[index] = VPotentialExact[index];
@@ -203,9 +179,8 @@ void InitVoltandCharge3D(float * VPotentialExact,float *VPotential,float * RhoCh
 //
 float TestFunction1PotentialEval(double a, double b, double  c, float radius0,float phi0,float z0) {
 	
-	float ret = a * (pow(radius0,4) - 338.0 * pow(radius0,3) + 21250.75 * pow(radius0,2));
-	ret *= cos(b*phi0);
-	ret *= exp ( -1 * c * z0*z0);
+  //TFormula vTestFunction1("f1", "[0]*(x^4 - 338.0 *x^3 + 21250.75 * x^2)*cos([1]* y)^2*exp(-1* [2] * z^2)");
+	float ret = a * (pow(radius0,4) - 338.0 * pow(radius0,3) + 21250.75 * pow(radius0,2)) * pow(cos(b*phi0),2) * exp ( -1 * c * z0*z0);
 
 
 	return ret;
@@ -213,17 +188,26 @@ float TestFunction1PotentialEval(double a, double b, double  c, float radius0,fl
 //
 float TestFunction1ChargeEval(double a, double b, double  c, float radius0,float phi0,float z0) {
 	
+  //TFormula rhoTestFunction1("ff1", "[0]*(((16.0 * x^2 - 9.0 * 338.0 * x + 4.0*21250.75) *cos([1] * y)^2 * exp(-1 *[2]*z^2)) - ((x^2 -  338.0 * x + 21250.75) * 2 * [1]^2 * cos(2 * [1] * y) * exp(-1 *[2]*z^2)) + ((x^4 -  338.0 * x^3 + 21250.75 * x^2) * cos([1] * y)^2 * (4*[2]^2*z^2 - 2 * [2]) * exp(-1 *[2]*z^2)))");
 	
-	float ret = a * (((16.0 * pow(radius0,2) - 9.0 * 338.0 * radius0 + 4.0*21250.75 ) * pow(cos (b * phi0),2.0) *exp(-1 * c * z0 * z0) ) - ((pow(radius0,2.0) - 338.0 * radius0 + 21250.75) *2 * b*b* cos(2 * b * phi0)  * exp(-1 * c *z0 * z0) ) + ((pow(radius0,4.0) - 338.0 * pow(radius0,3.0) + 21250.75 * pow(radius0,2.0)) * pow(cos(b * phi0),2.0) * (4 *c*c *z0*z0 - 2 *c) * exp(-1 * c * z0 * z0))) ;
+	float ret = a * (((16.0 * pow(radius0,2) - 9.0 * 338.0 * radius0 + 4.0*21250.75 ) * pow(cos (b * phi0),2) *exp(-1 * c * z0 * z0) ) - ((pow(radius0,2) - 338.0 * radius0 + 21250.75) *2 * b*b* cos(2 * b * phi0)  * exp(-1 * c *z0 * z0) ) + ((pow(radius0,4) - 338.0 * pow(radius0,3) + 21250.75 * pow(radius0,2)) * pow(cos(b * phi0),2) * (4.0 *c*c *z0*z0 - 2 *c) * exp(-1 * c * z0 * z0))) ;
 	return ret;
 }			
 	
 	
-
-
+// testing
 int main() {
 
 	
     	DoPoissonSolverExperiment(17, 17, 18,  200, 0);
+	std::cout << "\n";
+    	DoPoissonSolverExperiment(33, 33, 36,  200, 0);
+	std::cout << "\n";
+   	DoPoissonSolverExperiment(65, 65, 72,  200, 0);
+	std::cout << "\n";
+    	DoPoissonSolverExperiment(129, 129, 144,  200, 0);
+	std::cout << "\n";
+    	DoPoissonSolverExperiment(257, 257, 288,  200, 0);
+	std::cout << "\n";
 	return 0;
 }

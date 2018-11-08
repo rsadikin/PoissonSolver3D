@@ -104,7 +104,10 @@ public:
   void SetStrategy(StrategyType strategy) {fStrategy = strategy;}
   StrategyType GetStrategy() { return fStrategy; }
   void SetExactSolution(float *exactSolution,int nRRow, int nZColumn, int phiSlice);
-  float *fExactSolutionF;	
+  float *fExactSolutionF;
+
+  float GetErrorConv(int iteration) {return fErrorConvF[iteration];	}
+  float GetErrorExact(int iteration) {return fErrorExactF[iteration];	}
 private:
   PoissonSolver3DCylindricalGPU(const PoissonSolver3DCylindricalGPU &);               // not implemented
   PoissonSolver3DCylindricalGPU &operator=(const PoissonSolver3DCylindricalGPU &);    // not implemented
