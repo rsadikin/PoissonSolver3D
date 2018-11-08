@@ -1,6 +1,7 @@
 #ifndef POISSONSOLVER3DCYLINDRICALGPU_H
 #define POISSONSOLVER3DCYLINDRICALGPU_H
 
+/// \file PoissonSolver3DCylindricalGPU.h
 /// \class PoissonSolver3DCylindricalGPU
 /// \brief Kelas ini merupakan interface PoissonSolver 3D dalam koordinat silindrikal 
 /// yang diterapkan pada NVDIA Cuda
